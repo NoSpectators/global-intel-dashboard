@@ -27,20 +27,22 @@ intel-dashboard/
 ### Prerequisites
 Ensure you have **Docker** and **Docker Compose** installed on your system.
 
+### Step 1: Build and Start Services
+Launch both MongoDB and Streamlit in containers:
+```bash
+docker-compose up --build
+```
+
 This command:
 - Builds the Streamlit app from the Dockerfile
 - Starts MongoDB on port `27017`
 - Starts the Streamlit frontend on port `8501`
 - Both services are networked together automatically
 
-```
-bash docker-compose up --build
-```
-
 ### Step 2: Seed the Database
-In a **new terminal**, populate MongoDB with 100 mock intelligence reports: 
-```
-bash python seeder.py
+In a **new terminal**, populate MongoDB with 100 mock intelligence reports:
+```bash
+python seeder.py
 ```
 
 This script:
@@ -60,6 +62,31 @@ You should now see the 3D geospatial map with intelligence distribution across U
 
 ## 🔄 System Architecture & Data Flow
 
+```
+┌──────────────────────────────────────────────────────────────┐
+│                     seeder.py (One-time)                     │
+│  - Defines AOR_CONFIG (single source of truth)               │
+│  - Generates 100 synthetic intel reports                     │
+│  - Inserts into MongoDB intel_db.reports collection          │
+└────────────────┬─────────────────────────────────────────────┘
+                 │
+                 ↓
+┌──────────────────────────────────────────────────────────────┐
+│              MongoDB (Persistent Storage)                    │
+│  - Database: intel_db                                        │
+│  - Collection: reports                                       │
+│  - Documents: {ccom, country, lat, lon, intensity, ...}     │
+└────────────────┬─────────────────────────────────────────────┘
+                 │
+                 ↓
+┌──────────────────────────────────────────────────────────────┐
+│                   app.py (Streamlit)                         │
+│  - Imports AOR_CONFIG from seeder.py                         │
+│  - Fetches data from MongoDB based on selected AOR           │
+│  - Renders 3D map with PyDeck ColumnLayer                    │
+│  - Displays raw intelligence feed in tabular format          │
+└──────────────────────────────────────────────────────────────┘
+```
 
 ### How It Works
 
@@ -83,7 +110,19 @@ You should now see the 3D geospatial map with intelligence distribution across U
 ## 📊 Database Schema
 
 Each intelligence report in the `reports` collection contains:
-
+```
+{
+  "_id": ObjectId,
+  "ccom": "USEUCOM",
+  "country": "Poland",
+  "lat": 50.5,
+  "lon": 15.3,
+  "intensity": 75,
+  "summary": "MOCK INTEL: Detected regional movement pattern.",
+  "source": "Synthetic Generator",
+  "timestamp": ISODate("2026-02-03T14:30:00Z")
+}
+```
 
 ## 🛠️ Data Strategy: Placeholder vs. Production
 Currently, `seeder.py` generates **synthetic intelligence points** to demonstrate the platform’s visualization capabilities. This serves as a "Mission-Ready" placeholder.
