@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # The Database Layer
+  mongodb:
+    image: mongo:latest
+    container_name: intel_db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # The Frontend Layer
+  streamlit-app:
+    build: .
+    container_name: intel_ui
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mongodb
+    environment:
+      # We use the service name 'mongodb' as the hostname
+      - MONGO_URL=mongodb://mongodb:27017/
+
+# Persistent storage for your intel reports
+volumes:
+  mongo_data:

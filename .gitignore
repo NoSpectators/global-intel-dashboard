@@ -1,0 +1,55 @@
+# =====================
+# Secrets / credentials
+# =====================
+auth-files/
+!auth-files/example.env
+export-all.local.sh
+*.env
+*.key
+*.pem
+
+# =====================
+# Docker
+# =====================
+.env.docker
+docker-compose.override.yml
+*.pid
+
+# Docker runtime files
+**/docker-data/
+**/data/
+
+# =====================
+# MongoDB
+# =====================
+mongo-data/
+mongodb-data/
+dump/
+*.bson
+*.lock
+
+# =====================
+# Python
+# =====================
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# =====================
+# Logs
+# =====================
+*.log
+logs/
+
+# =====================
+# IDEs / Editors
+# =====================
+.idea/
+.vscode/
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
